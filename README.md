@@ -6,7 +6,8 @@ This repo contains attempts to improve the accuracy of [SeanPLeary's dc_tts-tran
 
 # Additional Changes
 
-For consitency and reduced code, datasets must match the format of the LJSpeed dataset including using the filename "metadata.csv" rather than "transcript.csv"
+For consitency and reduced code, datasets must match the format of the LJSpeed dataset including using the filename "metadata.csv" rather than "transcript.csv".
+
 Command line options have been added to make it easy to switch between models without editing the hyperparams.py file
 
 ---
