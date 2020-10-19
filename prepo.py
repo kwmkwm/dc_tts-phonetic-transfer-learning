@@ -3,6 +3,9 @@
 '''
 By kyubyong park. kbpark.linguist@gmail.com.
 https://www.github.com/kyubyong/dc_tts
+
+Modified
+https://github.com/kwmkwm/dc_tts-phonetic-transfer-learning
 '''
 
 from __future__ import print_function

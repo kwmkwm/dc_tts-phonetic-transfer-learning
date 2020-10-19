@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+'''
+https://github.com/kwmkwm/dc_tts-phonetic-transfer-learning
+'''
 
 from hyperparams import Hyperparams as hp
 from data_load import text_normalize

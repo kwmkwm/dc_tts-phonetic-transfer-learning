@@ -6,6 +6,9 @@ https://www.github.com/kyubyong/dc_tts
 
 Modified by sean leary. learysean1@hotmail.com
 https://github.com/SeanPLeary/dc_tts-transfer-learning
+
+Modified
+https://github.com/kwmkwm/dc_tts-phonetic-transfer-learning
 '''
 
 from __future__ import print_function
@@ -28,7 +31,7 @@ import sys
 def synthesize(logdir, txtfile, outdir):
     # Load data
     L = load_data("_",mode="synthesize", txtfile=txtfile)
-    
+
     # Load graph
     g = Graph(mode="synthesize")
     print("Graph loaded")

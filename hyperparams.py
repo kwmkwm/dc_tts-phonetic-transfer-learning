@@ -6,6 +6,9 @@ https://www.github.com/kyubyong/dc_tts
 
 Modified by sean leary. learysean1@hotmail.com
 https://github.com/SeanPLeary/dc_tts-transfer-learning
+
+Modified
+https://github.com/kwmkwm/dc_tts-phonetic-transfer-learning
 '''
 
 import os
