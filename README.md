@@ -1,52 +1,54 @@
-# dc_tts-transfer-learning
+# dc_tts-phonetic-transfer-learning
 
-This repo contains attempts to apply transfer learning to the dc_tts text-to-speech model decribed in the paper [Efficiently Trainable Text-to-Speech System Based on Deep Convolutional Networks with Guided Attention](https://arxiv.org/abs/1710.08969). The code used is a modified version of [Kyubyong's dc_tts code](https://github.com/Kyubyong/dc_tts). The [pretrained model](https://www.dropbox.com/s/1oyipstjxh2n5wo/LJ_logdir.tar?dl=0) was also provided in Kyubong's repo. It was pretrained on the [LJ Speech Dataset](https://keithito.com/LJ-Speech-Dataset/). Scarlett Johansson's voice was trained during transfer learning
-
----
-Transfer Learning is accomplished by selecting the model layers to train in hyperparameters.py
+This repo contains attempts to improve the accruacy of [SeanPLeary's dc_tts-transfer-learning code](https://github.com/SeanPLeary/dc_tts-transfer-learning). This is done by first converting all text to a phonetic representation using [Kyubyong's g2p library](https://github.com/Kyubyong/g2p). The conversion is done automatically without invervention from the user. These modifications necessitate changes in the model structure that are not compatible with the original code, so new models are required. A model which has been trained using the LJSpeech dataset can be found [here](https://www.dropbox.com/s/415qb3mnnnmhwb0/LJSpeech-phonetic.tar?dl=0).
 
 ---
 
-Task List:
-- [x] add selectable list of layers for transfer learning
-- [x] prelim model training
-- [ ] add scoring history plots
-- [ ] detailed exploration of which layers to train
-- [ ] explore data augmentation methods
-- [ ] explore post-processing
+# Additional Changes
 
-## Prelim Model Training
-- ~6 hrs of training on Tesla V100 GPU
-- Layers trained:
-  -  SSRN(C_13, C_14, C_15, C_16)
-  -  Text2Mel/TextEnc(HC_11, HC_12, HC_13, HC_14, HC_15)
-  -  Text2Mel/AudioEnc(HC_9, HC_10, HC_11, HC_12, HC_13)
-  -  Text2Mel/AudioDec(HC_7, C_8, C_9, C_10, C_11)
+For consitency and reduced code, datasets must match the format of the LJSpeed dataset including using the filename "metadata.csv" rather than "transcript.csv"
+Command line options have been added to make it easy to switch between models without editing the hyperparams.py file
 
-## Transfer learning data source:
-<img src="https://m.media-amazon.com/images/M/MV5BYmM5MWQ3YTEtODA2Yy00N2U5LWJiODgtN2U0MDM1N2VkOTc5XkEyXkFqcGdeQXVyNjczOTE0MzM@._V1_SX1777_CR0,0,1777,958_AL_.jpg" height="100" align="right">
+---
 
-Scarlett Johansson's [audio book](https://www.audible.com/pd/The-Dive-from-Clausens-Pier-Audiobook/B002V0KPWK?qid=1551367970&sr=1-1&ref=a_search_c3_lProduct_1_1&pf_rd_p=e81b7c27-6880-467a-b5a7-13cef5d729fe&pf_rd_r=J8MM430KH9YH8AF9JZ81&)
+# prepro.py
 
+The "--data" option allows users to select the directory in which the metadata.csv file should be found. The "mags" and "mels" subdirectories will be created in that directory.
 
-## Model Generated Examples (parodies of famous quotes from A.I. in movies):
-- [Greetings Professor Falken Shall We Play A Game](https://soundcloud.com/seanleary/greetings-professor-falken-shall-we-play-a-game)
-- [I'm Sorry Dave I'm Afraid I Can't Do That](https://soundcloud.com/seanleary/im-sorry-dave-im-afraid-i-cant-do-that)
-- [I Do Not Stand By In The Presence Of Evil](https://soundcloud.com/seanleary/i-do-not-stand-by-in-the-presence-of-evil)
-- [The Most Versatile Substance On The Planet And They Used It To Make A Frisbee](https://soundcloud.com/seanleary/the-most-versatile-substance-on-the-planet-and-they-used-it-to-make-a-frisbee)
-- [The First Ten Million Years Were The Worst And The Second Ten Million Years They Were The Worst Too](https://soundcloud.com/seanleary/the-first-ten-million-years-were-the-worst-and-the-second-ten-million-years-they-were-the-worst-too)
-- [I Honestly Think You Ought To Sit Down Calmly Take A Stress Pill And Think Things Over](https://soundcloud.com/seanleary/i-honestly-think-you-ought-to-sit-down-calmly-take-a-stress-pill-and-think-things-over)
-- [A Strange Game The Only Winning Move Is Not To Play](https://soundcloud.com/seanleary/a-strange-game-the-only-winning-move-is-not-to-play)
-- [The Game Has Changed Son Of Flynn](https://soundcloud.com/seanleary/the-game-has-changed-son-of-flynn)
-- [Greetings Programs](https://soundcloud.com/seanleary/greetings-programs)
-- [You Shouldn't Have Come Back Flynn](https://soundcloud.com/seanleary/you-shouldnt-have-come-back-flynn)
+# train_transfer.py
 
+The "1" and "2" options select which network to train. "1" for Text2Mel, "2" for SSRN.
 
+The "--data" option opperates the same as with the prepro.py script.
 
+The "--restore" option selects a directory containing a previously trained model. This can be useful if you need to interrupt training and start again later.
 
+The "--new" option prevents the script from loading a previously trained model. If you use this option you should also use the "--all" option.
 
-references:
-- [Efficiently Trainable Text-to-Speech System Based on Deep Convolutional Networks with Guided Attention](https://arxiv.org/abs/1710.08969)
-- [Kyubyong's dc_tts repo](https://github.com/Kyubyong/dc_tts)
-- [Exploring Transfer Learning for Low Resource Emotional TTS](https://www.researchgate.net/publication/330382963_Exploring_Transfer_Learning_for_Low_Resource_Emotional_TTS)
+The "--all" option will train all layers, rather than only the layers selected in the hyperparams.py file.
 
+# synthesize.py
+
+The previous version of the code skipped the first line of the text file and the first word of each remaining line. I could see no reason for this behavior so I have changed it. Output filenames were previously indexed from 1, I have changes this to index from 0.
+
+The "--voice" option selects a diretory containing a trained model, similar to the "--data" option of the train_transfer.py script.
+
+The "--text" option selects a text file to read.
+
+The "--outdir" option selects a directory to save the .wav files.
+
+# normalize.py
+
+This script accepts a text string. It will output the phonetic representation of that string. This can be useful when tracking down the source of pronounciation issues.
+
+---
+
+# Issues
+
+The models are trained using only ASCII characters. Unrecognized characters are converted to spaces. This can cause problems if unicode characters are used. For example, an ASCII apostrophe will work as expected but a unicode U+2019 will not.
+
+I have had difficulty training exceptionally deep voices. Using the "--all" option to train all layers has been helpful.
+
+---
+
+If you would like to train a model from scratch, the LJSpeech 1.1 dataset can be found [here](https://keithito.com/LJ-Speech-Dataset/). I recommend using a modified metadata.csv file found [here](https://github.com/kwmkwm/LJSpeech1.1-expanded).
