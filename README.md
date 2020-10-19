@@ -1,6 +1,6 @@
 # dc_tts-phonetic-transfer-learning
 
-This repo contains attempts to improve the accruacy of [SeanPLeary's dc_tts-transfer-learning code](https://github.com/SeanPLeary/dc_tts-transfer-learning). This is done by first converting all text to a phonetic representation using [Kyubyong's g2p library](https://github.com/Kyubyong/g2p). The conversion is done automatically without invervention from the user. These modifications necessitate changes in the model structure that are not compatible with the original code, so new models are required. A model which has been trained using the LJSpeech dataset can be found [here](https://www.dropbox.com/s/415qb3mnnnmhwb0/LJSpeech-phonetic.tar?dl=0).
+This repo contains attempts to improve the accuracy of [SeanPLeary's dc_tts-transfer-learning code](https://github.com/SeanPLeary/dc_tts-transfer-learning). This is done by first converting all text to a phonetic representation using [Kyubyong's g2p library](https://github.com/Kyubyong/g2p). The conversion is done automatically without invervention from the user. These modifications necessitate changes in the model structure that are not compatible with the original code, so new models are required. A model which has been trained using the LJSpeech dataset can be found [here](https://www.dropbox.com/s/415qb3mnnnmhwb0/LJSpeech-phonetic.tar?dl=0).
 
 ---
 
@@ -29,7 +29,7 @@ The "--all" option will train all layers, rather than only the layers selected i
 
 # synthesize.py
 
-The previous version of the code skipped the first line of the text file and the first word of each remaining line. I could see no reason for this behavior so I have changed it. Output filenames were previously indexed from 1, I have changes this to index from 0.
+The previous version of the code skipped the first line of the text file and the first word of each remaining line. I could see no reason for this behavior so I have changed it. Output filenames were previously indexed from 1, I have changed this to index from 0.
 
 The "--voice" option selects a diretory containing a trained model, similar to the "--data" option of the train_transfer.py script.
 
