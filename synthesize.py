@@ -1,5 +1,5 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# /usr/bin/python2
 '''
 By kyubyong park. kbpark.linguist@gmail.com.
 https://www.github.com/kyubyong/dc_tts
@@ -21,30 +21,36 @@ from data_load import load_data
 from scipy.io.wavfile import write
 from tqdm import tqdm
 
-def synthesize():
-    # Load data
-    L = load_data("synthesize")
+import argparse
+import sys
 
+
+def synthesize(logdir, txtfile, outdir):
+    # Load data
+    L = load_data("_",mode="synthesize", txtfile=txtfile)
+    
     # Load graph
-    g = Graph(mode="synthesize"); print("Graph loaded")
+    g = Graph(mode="synthesize")
+    print("Graph loaded")
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
         # Restore parameters
-        var_list = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, 'Text2Mel')
+        var_list = tf.get_collection(
+            tf.GraphKeys.TRAINABLE_VARIABLES, 'Text2Mel')
         saver1 = tf.train.Saver(var_list=var_list)
-        saver1.restore(sess, tf.train.latest_checkpoint(hp.restoredir + "-1"))
+        saver1.restore(sess, tf.train.latest_checkpoint(logdir + "-1"))
         print("Text2Mel Restored!")
 
         var_list = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, 'SSRN') + \
-                   tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, 'gs')
+            tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, 'gs')
         saver2 = tf.train.Saver(var_list=var_list)
-        saver2.restore(sess, tf.train.latest_checkpoint(hp.restoredir + "-2"))
+        saver2.restore(sess, tf.train.latest_checkpoint(logdir + "-2"))
         print("SSRN Restored!")
 
         # Feed Forward
-        ## mel
+        # mel
         Y = np.zeros((len(L), hp.max_T, hp.n_mels), np.float32)
         prev_max_attentions = np.zeros((len(L),), np.int32)
         for j in tqdm(range(hp.max_T)):
@@ -60,14 +66,57 @@ def synthesize():
         Z = sess.run(g.Z, {g.Y: Y})
 
         # Generate wav files
-        if not os.path.exists(hp.sampledir): os.makedirs(hp.sampledir)
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
         for i, mag in enumerate(Z):
-            print("Working on file", i+1)
+            print("Working on file", i)
             wav = spectrogram2wav(mag)
-            write(hp.sampledir + "/{}.wav".format(i+1), hp.sr, wav)
+            write(outdir + "/" + os.path.basename(txtfile) +
+                  ".{}.wav".format(i), hp.sr, wav)
+
+
+def get_arguments():
+    parser = argparse.ArgumentParser(description='DC_TTS synthesizer')
+    parser.add_argument('--voice', type=str, required=False,
+                        help='Directory containing output/logdir subdirectories')
+    parser.add_argument('--text', type=str, required=False, help='TXT file')
+    parser.add_argument('--outdir', type=str, required=False,
+                        help='Directory to output wav files')
+    arguments = parser.parse_args()
+    return arguments
+
 
 if __name__ == '__main__':
-    synthesize()
+    args = get_arguments()
+
+    if args.voice:
+        if not os.path.exists(args.voice):
+            print('Directory %s not found. Exiting.' % args.voice)
+            sys.exit()
+        else:
+            voicedir = args.voice
+    else:
+        voicedir = hp.restoredir
+
+    logdir = voicedir + hp.logdir
+
+    if args.text:
+        if not os.path.exists(args.text):
+            print('File %s not found. Exiting.' % args.text)
+            sys.exit()
+        else:
+            txtfile = args.text
+    else:
+        txtfile = hp.test_data
+
+    if args.outdir:
+        if not os.path.exists(args.outdir):
+            print('Directory %s not found. Exiting.' % args.outdir)
+            sys.exit()
+        else:
+            outdir = args.outdir
+    else:
+        outdir = voicedir + hp.sampledir
+
+    synthesize(logdir, txtfile, outdir)
     print("Done")
-
-
