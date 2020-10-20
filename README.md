@@ -50,6 +50,8 @@ The models are trained using only ASCII characters. Unrecognized characters are 
 
 I have had difficulty training exceptionally deep voices. Using the "--all" option to train all layers has been helpful.
 
+g2p can have difficulty with initialisms. For example, "FBI" will not be pronouced correctly. This can be resolved by spacing out the letters as "F B I". You can force a hard-A as "ay"
+
 ---
 
 If you would like to train a model from scratch, the LJSpeech 1.1 dataset can be found [here](https://keithito.com/LJ-Speech-Dataset/). I recommend using a modified metadata.csv file found [here](https://github.com/kwmkwm/LJSpeech1.1-expanded).
